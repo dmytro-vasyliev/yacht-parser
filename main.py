@@ -6,9 +6,6 @@ import requests
 from lxml import html
 
 
-PAGE_TEMPLATE = "https://www.yachtic.com/yacht-name?d=date.2022&w=1"
-
-
 def generate_dates(start_date, end_date):
     weekmask = "Sat"
     return pd.bdate_range(start_date, end_date, freq='C', weekmask=weekmask)
@@ -32,7 +29,7 @@ def get_price(source):
 def get_price_table(yachts, dates):
     df = pd.DataFrame(index=yachts, columns=dates.strftime("%d.%m"))
     for yacht in yachts:
-        print('Searching for prices for yacht: {}'.format(yacht))        
+        print('>>> Process yacht: {}'.format(yacht))        
         prices = []
         for date in dates:
             converted_date = date.strftime("%d.%m.%Y")
@@ -46,33 +43,6 @@ def get_price_table(yachts, dates):
 def save_prices(df):
     result_file = open("result.txt", "w")
     result_file.write(df.to_string())
-    # df.to_csv("result.csv")
-
-
-def get_prices_to_file(yachts, dates):
-    result_file = open("result", "w")
-
-    for yacht in yachts:
-        result_file.write(yacht)
-        page_yacht_template = PAGE_TEMPLATE.replace("yacht-name", yacht.translate(str.maketrans('', '', ' \n\t\r')))
-        for date in dates:
-            result_file.write("{}\n".format(date))
-            page = page_yacht_template.replace("date", date.translate(str.maketrans('', '', ' \n\t\r')))
-            source = get_source(page)
-            price = get_price(source)
-            result_file.write(price)
-            result_file.write("\n\n")
-        result_file.write("\n")
-
-
-def old_main():
-    date_file = open("dates.txt", "r")
-    dates = date_file.read().splitlines()
-
-    yacht_file = open("yacht-names.txt", "r")
-    yachts = yacht_file.readlines()
-
-    get_prices_to_file(yachts, dates)
 
 
 def main():
@@ -92,4 +62,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # old_main()
