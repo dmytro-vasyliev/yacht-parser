@@ -27,7 +27,7 @@ def get_price(source):
 
 
 def get_price_table(yachts, dates):
-    df = pd.DataFrame(index=yachts, columns=dates.strftime("%d.%m"))
+    df = pd.DataFrame(index=yachts, columns=dates.strftime("%m/%d"))
     for yacht in yachts:
         print('>>> Process yacht: {}'.format(yacht))        
         prices = []
@@ -43,6 +43,8 @@ def get_price_table(yachts, dates):
 def save_prices(df):
     result_file = open("result.txt", "w")
     result_file.write(df.to_string())
+    df.to_csv("result.csv")
+    df.to_excel("result.xlsx")
 
 
 def main():
