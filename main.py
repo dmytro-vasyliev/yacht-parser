@@ -7,8 +7,12 @@ import requests
 from lxml import html
 
 
+def validate_link(link):
+    return link.find('yachtic.com') != -1
+
+
 def extract_yachtic_baselink(yachtic_link):
-    return yachtic_link.split("?")[0]
+    return yachtic_link.split("?")[0].rstrip('#')
 
 
 def generate_dates(start_date, end_date):
@@ -65,7 +69,7 @@ def main():
     dates_idx = generate_dates(args.start_date, args.end_date)
 
     yacht_links = args.infile.read().splitlines()
-    yacht_baselinks = [extract_yachtic_baselink(link) for link in yacht_links]
+    yacht_baselinks = [extract_yachtic_baselink(link) for link in yacht_links if validate_link(link)]
     prices_dataframe = get_price_table(yacht_baselinks, dates_idx)
     save_prices(prices_dataframe, args.outdir)
 
