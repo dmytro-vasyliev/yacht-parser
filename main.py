@@ -1,4 +1,5 @@
 import argparse
+import os
 from datetime import datetime
 
 import pandas as pd
@@ -44,17 +45,19 @@ def get_price_table(yacht_baselinks, dates):
     return df
 
 
-def save_prices(df):
-    result_file = open("result.txt", "w")
+def save_prices(df, outdir):
+    os.makedirs(outdir, exist_ok=True)
+    filename = "prices"
+    result_file = open(os.path.join(outdir, "{}.txt".format(filename)), "w")
     result_file.write(df.to_string())
-    df.to_csv("result.csv")
-    df.to_excel("result.xlsx")
+    df.to_csv(os.path.join(outdir, "{}.csv".format(filename)))
+    df.to_excel(os.path.join(outdir, "{}.xlsx".format(filename)))
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('infile', type=argparse.FileType('r'))
-    parser.add_argument('outfile', type=argparse.FileType('w'))
+    parser.add_argument('outdir', type=str)
     parser.add_argument('--start_date', type=lambda d: datetime.strptime(d, '%d.%m.%Y'), required=True)
     parser.add_argument('--end_date', type=lambda d: datetime.strptime(d, '%d.%m.%Y'), required=True)
     args = parser.parse_args()
@@ -64,7 +67,7 @@ def main():
     yacht_links = args.infile.read().splitlines()
     yacht_baselinks = [extract_yachtic_baselink(link) for link in yacht_links]
     prices_dataframe = get_price_table(yacht_baselinks, dates_idx)
-    save_prices(prices_dataframe)
+    save_prices(prices_dataframe, args.outdir)
 
 
 if __name__ == '__main__':
