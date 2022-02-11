@@ -5,6 +5,7 @@ from datetime import datetime
 import pandas as pd
 import requests
 from lxml import html
+from tqdm import tqdm
 
 
 def validate_link(link):
@@ -37,12 +38,12 @@ def get_price(source):
 
 def get_price_table(yacht_baselinks, dates):
     df = pd.DataFrame(index=yacht_baselinks, columns=dates.strftime("%m/%d"))
-    for yacht_baselink in yacht_baselinks:
-        print('>>> Process yacht: {}'.format(yacht_baselink))
+    for yacht_baselink in tqdm(yacht_baselinks, desc="Yachts"):
+        # print('>>> Process yacht: {}'.format(yacht_baselink))
         prices = []
-        for date in dates:
+        for date in tqdm(dates, desc="Dates"):
             converted_date = date.strftime("%d.%m.%Y")
-            print('Requesting price for date: {}'.format(converted_date))
+            # print('Requesting price for date: {}'.format(converted_date))
             source = get_source("{}?d={}&w=1".format(yacht_baselink, converted_date))
             prices.append(get_price(source))
         df.loc[yacht_baselink] = prices
